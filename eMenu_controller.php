@@ -52,7 +52,7 @@ else if ($_POST['page'] == 'MainPage') {
 
                 for ($i = 0; $i < count($result); $i++) {
 
-                    $str .= "<tr class='menu_list_row'>";
+                    $str .= "<tr class='menu-list-row'>";
                     foreach ($result[$i] as $k)
                         $str .= "<td class='d'>" . $k . "</td>";
                     $str .= "</tr>";
@@ -75,10 +75,10 @@ else if ($_POST['page'] == 'MainPage') {
             break;
 
         case 'CreateNewMenu':
-            if (!is_new($_POST['data'], $_SESSION['accountid'])) {
-                $result = create_new_menu($_SESSION['accountid'], $_POST['data']);
+            if (is_new($_POST['data'], $_SESSION['accountid'])) {
+                $result = create_new_menu($_POST['data'], $_SESSION['accountid']);
 
-                if ($result == true)
+                if ($result)
                     echo 'Menu Created';
                 else
                     echo 'Error: Unable to create menu.';

@@ -62,7 +62,7 @@ if (!isset($_SESSION['SignIn'])) {
     <div class="container" id="body">
         <div class="row" id="edit_body">
             <div class="col-lg-3" id="menu_tree">
-                <p id="tree_menu_name">Test text</p>
+                <p id="tree_menu_name">Loading Menu Details...</p>
             </div>
             <div class="col-lg-6" id="menu_edit_form">
                 <h1 style="text-align: center;" id="item_name">Item Name</h1>
@@ -92,15 +92,20 @@ if (!isset($_SESSION['SignIn'])) {
                 </div>
             </div>
             <div class="col-lg-2" id="node_controls">
-                <p>Test text</p>
+                <button id="add_category" class="menu-node-btn">New Category</button>
+                <button id="add_subcategory" class="menu-node-btn">New Subcategory</button>
+                <button id="add_badge" class="menu-node-btn">New Badge</button>
+                <button id="add_image" class="menu-node-btn">Import Image</button>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <button id="save_changes" class="menu-node-btn">Save Changes</button>
+                <button id="menu_activate" class="menu-node-btn">Activate Menu</button>
             </div>
         </div>
-        <div class="row" style="text-align: right">
+        <!--<div class="row" style="text-align: right">
             <div class="col-lg-12" id="edit_controls">
-                <button id="save_changes" class="menu-edit-btn">Save Changes</button>
-                <button id="menu_activate" class="menu-edit-btn">Activate Menu</button>
+
             </div>
-        </div>
+        </div>-->
     </div>
 
     <!--==================================Modals=======================================-->
@@ -138,17 +143,18 @@ if (!isset($_SESSION['SignIn'])) {
     <div class="container">
         <div class="column">
             <div class="row"  id="new_menu_form">
-                <form method="post" action="eMenu_controller.php">
+                <form>
                     <label class="form-label">Menu Name</label><br>
-                    <input class="field" type="text" name="new_menu_name" required>
+                    <input class="field" id="new_menu_name" type="text" name="new_menu_name" required>
                     <br>
-                    <input class="btn" id="new_submit" type="submit" value="Create">
+                    <input class="btn" id="new_submit" type="button" value="Create">
                     <input class="btn" id="new_cancel" type="button" value="Cancel"><br>
                 </form>
             </div>
         </div>
     </div>
 </body>
+
 <script>
     "use strict";
     //On load, calculates positioning of various elements, displays menu_manager modal, and hides menu editor/ body.
@@ -161,145 +167,171 @@ if (!isset($_SESSION['SignIn'])) {
         document.getElementById('new_menu_form').style.left = 'calc(50% + 180px)';
         $('#menu_manager_modal').show();
         $('#blanket').show();
-    });
-
-    //Retrieves account name and list of menus on page load
-    window.addEventListener('load' ,function () {
         $.post("eMenu_controller.php",
             { page: 'MainPage', command: 'GetName' },
             function(data) {
                 $("#user_name").html(data);
             });
+    });
+
+    //==============================Menu Manager controls==============================
+    //Retrieves account name and list of menus on page load
+    window.addEventListener('load' ,function () {
+        var name = '';
         $.post("eMenu_controller.php",
             { page: 'MainPage', command: 'GetMenus' },
             function(data) {
                 $("#menu_list").html(data);
+
+                //Formats and gets selected menu's name
+                $('#menu_list tr.menu-list-row').click(function () {
+                    $('.selected').removeClass('selected');
+                    $(this).addClass("selected");
+                    name = $('.d',this).html();
+                    $('#menu_options').show();
+                    $('#new_menu_form').hide();
+                });
             });
-    });
 
-    //==============================Menu Manager controls==============================
-    //TODO: figure out how to format and read data from selected row.
-    /*
-    $("tbody tr").click(function () {
-        $('.selected').removeClass('selected');
-        $(this).addClass("selected");
-        var data = $('.d',this).html();
-        alert(data);
-        $('#menu_options').show();
-        $('#new_menu_form').hide();
-    });
-    */
-
-    $('#menu_list').click(function () {
-        $('#menu_options').show();
-        $('#new_menu_form').hide();
-    });
-
-    //Edit menu button
-    //TODO: post to controller to populate page body with selected menu data.
-    //TODO: Change hardcoded var name to retrieve selected menu name.
-    $('#menu_edit').click(function () {
-        var name = 'Standard Menu';
-        $.post("eMenu_controller.php",
-            {page: 'MainPage', command: "GetMenuData", data: name},
-            function (data) {
-                var rows = JSON.parse(data);
-                var tree = '';
-                tree += "<table id='menu_edit_table'>";
-                tree += "<tr><th>" + name + "</th></tr>";
-                for (var i in rows.categories){
-                    tree += "<tr><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
-                    for (var j in rows.categories[i].subcategories){
-                        tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
-                        for (var k in rows.categories[i].subcategories[j].menu_items) {
-                            tree += "<tr><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
+        //Edit menu button
+        $('#menu_edit').click(function () {
+            $.post("eMenu_controller.php",
+                {page: 'MainPage', command: "GetMenuData", data: name},
+                function (data) {
+                    var rows = JSON.parse(data);
+                    var tree = '';
+                    tree += "<table id='menu_edit_table'>";
+                    tree += "<tr><th>" + name + "</th></tr>";
+                    for (var i in rows.categories){
+                        tree += "<tr><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
+                        for (var j in rows.categories[i].subcategories){
+                            tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
+                            for (var k in rows.categories[i].subcategories[j].menu_items) {
+                                tree += "<tr><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
+                            }
                         }
                     }
-                }
-                tree += "</table>";
-                $("#menu_tree").html(tree);
+                    tree += "</table>";
+                    $("#menu_tree").html(tree);
 
-            });
-        $('#menu_manager_modal').hide();
-        $('#menu_options').hide();
-        $('#blanket').hide();
-        $('#body').show();
-    });
-
-    //Activate Menu button
-    //TODO: change hardcoded var name to retrieve selected menu name.
-    $('#menu_activate').click(function () {
-        var name = 'Standard Menu';
-
-        $.post("eMenu_controller.php",
-            { page: 'MainPage', command: 'ActivateMenu', data: name},
-            function(data) {
-                var response = $("#menu_manager_response");
-                response.show();
-                response.html(data);
-                setTimeout(function(){ response.hide(); }, 3000);
-            });
-    });
-
-    //Delete menu button
-    //TODO: change hardcoded var name to retrieve selected menu name.
-    $('#menu_delete').click(function () {
-        var name = 'Test Menu';
-        var confirm = $('#menu_manager_response');
-        var del = $('#menu_delete');
-
-        //Changes Delete button to cancel button when clicked.
-        if (confirm.css("display") != "none"){
-            del.html('Delete');
-            del.css("background-color", "#125BFF");
-        }else{
-            del.html('Cancel');
-            del.css("background-color", "darkred");
-        }
-        confirm.toggle();
-        confirm.html('Click here to delete selected menu.');
-        confirm.click(function () {
-            $.post("eMenu_controller.php",
-                { page: 'MainPage', command: 'DeleteMenu', data: name},
-                function(data) {
-                    var response = $("#menu_manager_response");
-                    response.show();
-                    response.html(data);
-                    setTimeout(function(){ response.hide(); }, 3000);
                 });
+            $('#menu_manager_modal').hide();
+            $('#menu_options').hide();
+            $('#blanket').hide();
+            $('#body').show();
+        });
+
+        //Activate Menu button
+        $('#menu_activate').click(function () {
             $.post("eMenu_controller.php",
-                { page: 'MainPage', command: 'GetMenus' },
+                { page: 'MainPage', command: 'ActivateMenu', data: name},
                 function(data) {
-                    $("#menu_list").html(data);
+                    if($('#menu_manager_modal').css("display") !== "none")
+                    {
+                        var response = $("#menu_manager_response");
+                        response.show();
+                        response.html(data);
+                        setTimeout(function () {response.hide();}, 3000);
+                    }else
+                        alert(data);
                 });
         });
-    });
 
-    //Duplicate menu button
-    $('#menu_duplicate').click(function () {
-        $('#new_menu_form').show();
-        $('#menu_options').hide();
+        //Delete menu button
+        $('#menu_delete').click(function () {
+            var confirm = $('#menu_manager_response');
+            var del = $('#menu_delete');
 
-        var menu = 'Test Menu';
-        var newName = $('#new_menu_name').val();
+            //Changes Delete button to cancel button when clicked.
+            if (confirm.css("display") !== "none"){
+                del.html('Delete');
+                del.css("background-color", "#125BFF");
+            }else{
+                del.html('Cancel');
+                del.css("background-color", "darkred");
+            }
+            confirm.toggle();
+            confirm.html('Click here to delete selected menu.');
+            confirm.click(function () {
+                $.post("eMenu_controller.php",
+                    { page: 'MainPage', command: 'DeleteMenu', data: name},
+                    function(data) {
+                        var response = $("#menu_manager_response");
+                        response.show();
+                        response.html(data);
+                        setTimeout(function(){ response.hide(); }, 3000);
 
-        if (name != "") {
-            $.post("eMenu_controller.php",
-                {page: 'MainPage', command: 'DuplicateMenu', data: {menu: menu, newName: newName}},
-                function (data) {
-                    //TODO: assign returned title to menu_tree title
-                    var response = $("#menu_manager_response");
-                    response.show();
-                    response.html(data);
-                    setTimeout(function(){ response.hide(); }, 3000);
-                });
-            $.post("eMenu_controller.php",
-                { page: 'MainPage', command: 'GetMenus' },
-                function(data) {
-                    $("#menu_list").html(data);
-                });
-        }else
-            $("#new_menu_response").html("");
+                        $.post("eMenu_controller.php",
+                            { page: 'MainPage', command: 'GetMenus' },
+                            function(data) {
+                                $("#menu_list").html(data);
+                            });
+                    });
+            });
+        });
+
+        //Duplicate menu button
+        $('#menu_duplicate').click(function () {
+            $('#new_menu_form').show();
+            $('#menu_options').hide();
+
+            var newName = $('#new_menu_name').val();
+
+            if (name !== "") {
+                $.post("eMenu_controller.php",
+                    {page: 'MainPage', command: 'DuplicateMenu', data: {menu: name, newName: newName}},
+                    function (data) {
+                        //TODO: assign returned title to menu_tree title
+                        var response = $("#menu_manager_response");
+                        response.show();
+                        response.html(data);
+                        setTimeout(function(){ response.hide(); }, 3000);
+                    });
+                $.post("eMenu_controller.php",
+                    { page: 'MainPage', command: 'GetMenus' },
+                    function(data) {
+                        $("#menu_list").html(data);
+                    });
+            }else
+                $("#new_menu_response").html("");
+        });
+
+        //==============================New Menu Controls==============================
+        //New Menu Button
+        $('#new_menu').click(function () {
+            $('#menu_options').hide();
+            $('#new_menu_form').show();
+            $('#blanket').show();
+
+        });
+
+        //Cancel button
+        $('#new_cancel').click(function () {
+            $('#new_menu_form').hide();
+        });
+
+        //Submit button
+        //TODO: fix bug described in model.
+        $('#new_submit').click(function (event) {
+
+            event.preventDefault();
+            var newName = $('#new_menu_name').val();
+            if (newName !== "") {
+                $.post("eMenu_controller.php",
+                    {page: 'MainPage', command: 'CreateNewMenu', data: newName},
+                    function (data) {
+                        //TODO: assign returned title to menu_tree title and close modal
+                        $("#menu_manager_response").html(data);
+
+                        $.post("eMenu_controller.php",
+                            { page: 'MainPage', command: 'GetMenus' },
+                            function(data) {
+                                $("#menu_list").html(data);
+                            });
+                    });
+            }else
+                $("#new_menu_response").html(".....");
+        });
     });
 
     //==============================Page Body Controls=============================
@@ -310,7 +342,7 @@ if (!isset($_SESSION['SignIn'])) {
             {page: 'MainPage', command: "GetMenuData", data: name},
             function (data) {
                 var parse = JSON.parse(data);
-                var info = 'Hello';
+                var info = '';
                 for (var i in parse.categories) {
                     for (var j in parse.categories[i].subcategories) {
                         for (var k in parse.categories[i].subcategories[j].menu_items) {
@@ -322,46 +354,18 @@ if (!isset($_SESSION['SignIn'])) {
             });
     });
 
-    //==============================New Menu Controls==============================
-    //New Menu Button
-    $('#new_menu').click(function () {
-        $('#menu_options').hide();
-        $('#new_menu_form').show();
-        $('#blanket').show();
-
-    });
-
-    //Cancel button
-    $('#new_cancel').click(function () {
-        $('#new_menu_form').hide();
-        //$('#menu_options').show();
-    });
-
-    //Submit button
-    //TODO: fix bug described in model.
-    $('#new_submit').click(function () {
-
-        //var name = $('#new_menu_name').val();
-        var name = 'New Menu';
-
-        if (name != '') {
-            $.post("eMenu_controller.php",
-                {page: 'MainPage', command: 'CreateNewMenu', data: name},
-                function (data) {
-                    //TODO: assign returned title to menu_tree title
-                    $("#menu_manager_response").html(data);
-                });
-            $.post("eMenu_controller.php",
-                { page: 'MainPage', command: 'GetMenus' },
-                function(data) {
-                    $("#menu_list").html(data);
-                });
-        }else
-            $("#new_menu_response").html("");
+    //Activate Menu button
+    $('#node_menu_activate').click(function () {
+        $.post("eMenu_controller.php",
+            { page: 'MainPage', command: 'ActivateMenu', data: name},
+            function(data) {
+                var alert = alert(data);
+                setTimeout(function(){ alert.hide(); }, 3000);
+            });
     });
 
     //==============================Account/ dropdown controls==============================
-    //Account button
+    //Account
     $('#account_btn').click(function () {
         $('.nav-dropdown').toggle();
     });
@@ -372,6 +376,8 @@ if (!isset($_SESSION['SignIn'])) {
         $('#blanket').show();
         $('.nav-dropdown').hide();
     });
+
+    //Help
 
     //Sign out
     $('#nav_sign_out').click(function () {

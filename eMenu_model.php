@@ -85,7 +85,7 @@ function get_name($u){
 
 //Creates new blank menu and adds it to database. New menu contains nothing in data column.
 //TODO: Fix bug where clicking new_submit button signs user out.
-function create_new_menu($restaurant, $name){
+function create_new_menu($name, $restaurant){
     global $conn;
 
     $id = get_rest_id($restaurant);
@@ -97,7 +97,6 @@ function create_new_menu($restaurant, $name){
                 values ('$name', $id, $curr_date)  ";
 
         mysqli_query($conn, $sql);
-        echo mysqli_error($conn);
 
         return true;
     }
