@@ -68,8 +68,8 @@ if (!isset($_SESSION['SignIn'])) {
                 <h1 style="text-align: center;" id="item_name">Item Name</h1>
                 <div class="row">
                     <form id="menu_edit_rows" method="post" action="eMenu_controller.php">
-                        <label class="form-label">Item Name: </label>
-                        <input class="form-input" id="form_item_name" type="text" name="form_item_name" required>
+                        <label class="form-label">Item Name:</label>
+                            <input class="form-input" id="form_item_name" type="text" name="form_item_name" required>
                         <br>
                         <label class="form-label">Item Category: </label>
                         <input class="form-input" id="form_item_category" type="text" name="form_item_category" required>
@@ -100,7 +100,7 @@ if (!isset($_SESSION['SignIn'])) {
                 </div>
                 <div class="row">
                     <button id="save_changes" class="menu-node-btn">Save Changes</button>
-                    <button id="menu_activate" class="menu-node-btn">Activate Menu</button>
+                    <button id="node_menu_activate" class="menu-node-btn">Activate Menu</button>
                 </div>
             </div>
         </div>
@@ -191,6 +191,32 @@ if (!isset($_SESSION['SignIn'])) {
                 });
             });
 
+        //functions used throughout.
+        function refresh_menu_list(){
+            $.post("eMenu_controller.php",
+                { page: 'MainPage', command: 'GetMenus' },
+                function(data) {
+                    $("#menu_list").html(data);
+                });
+        }
+        function node_activate_menu(){
+            $.post("eMenu_controller.php",
+                { page: 'MainPage', command: 'ActivateMenu', data: name},
+                function(data) {
+                    alert(data);
+                });
+        }
+        function activate_menu(){
+            $.post("eMenu_controller.php",
+                { page: 'MainPage', command: 'ActivateMenu', data: name},
+                function(data) {
+                    var response = $("#menu_manager_response");
+                    response.show();
+                    response.html(data);
+                    setTimeout(function () {response.hide();}, 3000);
+                });
+        }
+
         //Edit menu button
         $('#menu_edit').click(function () {
             edit_menu();
@@ -202,18 +228,7 @@ if (!isset($_SESSION['SignIn'])) {
 
         //Activate Menu button
         $('#menu_activate').click(function () {
-            $.post("eMenu_controller.php",
-                { page: 'MainPage', command: 'ActivateMenu', data: name},
-                function(data) {
-                    if($('#menu_manager_modal').css("display") !== "none")
-                    {
-                        var response = $("#menu_manager_response");
-                        response.show();
-                        response.html(data);
-                        setTimeout(function () {response.hide();}, 3000);
-                    }else
-                        alert(data);
-                });
+            activate_menu();
         });
 
         //Delete menu button
@@ -239,12 +254,10 @@ if (!isset($_SESSION['SignIn'])) {
                         response.show();
                         response.html(data);
                         setTimeout(function(){ response.hide(); }, 3000);
+                        del.html('Delete');
+                        del.css("background-color", "#125BFF");
 
-                        $.post("eMenu_controller.php",
-                            { page: 'MainPage', command: 'GetMenus' },
-                            function(data) {
-                                $("#menu_list").html(data);
-                            });
+                        refresh_menu_list();
                     });
             });
         });
@@ -260,17 +273,12 @@ if (!isset($_SESSION['SignIn'])) {
                 $.post("eMenu_controller.php",
                     {page: 'MainPage', command: 'DuplicateMenu', data: {menu: name, newName: newName}},
                     function (data) {
-                        //TODO: assign returned title to menu_tree title
                         var response = $("#menu_manager_response");
                         response.show();
                         response.html(data);
                         setTimeout(function(){ response.hide(); }, 3000);
 
-                        $.post("eMenu_controller.php",
-                            { page: 'MainPage', command: 'GetMenus' },
-                            function(data) {
-                                $("#menu_list").html(data);
-                            });
+                        refresh_menu_list();
                     });
             }else
                 $("#new_menu_response").html("");
@@ -302,11 +310,7 @@ if (!isset($_SESSION['SignIn'])) {
                         //TODO: assign returned title to menu_tree title and close modal
                         $("#menu_manager_response").html(data);
 
-                        $.post("eMenu_controller.php",
-                            { page: 'MainPage', command: 'GetMenus' },
-                            function(data) {
-                                $("#menu_list").html(data);
-                            });
+                        refresh_menu_list();
                     });
             }else
                 $("#new_menu_response").html(".....");
@@ -325,9 +329,11 @@ if (!isset($_SESSION['SignIn'])) {
                     for (var i in rows.categories) {
                         tree += "<tr><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
                         for (var j in rows.categories[i].subcategories) {
-                            tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
+                            tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " +
+                                rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
                             for (var k in rows.categories[i].subcategories[j].menu_items) {
-                                tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
+                                tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " +
+                                    rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
                             }
                         }
                     }
@@ -337,6 +343,7 @@ if (!isset($_SESSION['SignIn'])) {
                     $('#item_name').html("Item Name");
 
                     //Menu item clicked
+                    //TODO: Populate all fields with item data
                     var item = $('#menu_edit_table tr.i');
                     item.click(function () {
                         $('.selected').removeClass('selected');
@@ -347,27 +354,25 @@ if (!isset($_SESSION['SignIn'])) {
                         $('#form_item_name').val(item);
                     });
                 });
+            //TODO: node control button functionality
         }
-    });
-    //Menu Item Clicked
-    // $('.tree-menu-item').click(function () {
-    //     var name = 'Standard Menu';
-    //     $.post("eMenu_controller.php",
-    //         {page: 'MainPage', command: "GetMenuData", data: name},
-    //         function (data) {
-    //             var parse = JSON.parse(data);
-    //             var info = '';
-    //             for (var i in parse.categories) {
-    //                 for (var j in parse.categories[i].subcategories) {
-    //                     for (var k in parse.categories[i].subcategories[j].menu_items) {
-    //                         info += parse.categories[i].subcategories[j].menu_items[k].item_name;
-    //                     }
-    //                 }
-    //             }
-    //             $("#item_name").html(info);
-    //         });
-    // });
 
+        //Disables activate menu button until changes have been saved
+        var node_menu_activate = $('#node_menu_activate');
+        node_menu_activate.prop('disabled', true);
+        node_menu_activate.css('background-color', 'grey');
+
+        //Activate Menu button
+        node_menu_activate.click(function () {
+            node_activate_menu();
+        });
+
+        //Save Changes Button
+        $('#save_changes').click(function () {
+            node_menu_activate.prop('disabled', false);
+            node_menu_activate.css('background-color', '#125BFF');
+        });
+    });
     //==============================Account/ dropdown controls==============================
     //Account
     $('#account_btn').click(function () {
@@ -377,11 +382,13 @@ if (!isset($_SESSION['SignIn'])) {
     //Manage Menus
     $('#nav_manage_menus').click(function () {
         $('#menu_manager_modal').show();
+        $('#menu_options').show();
         $('#blanket').show();
         $('.nav-dropdown').hide();
     });
 
     //Help
+    //TODO: Make help page
 
     //Sign out
     $('#nav_sign_out').click(function () {

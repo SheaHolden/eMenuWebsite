@@ -110,8 +110,18 @@ div.row > #menu_edit_form{
     width: 100%
 }
 
-#form_input_description{
-    height: 5em;
+input:required {
+    box-shadow: none;
+}
+
+.menu-node-btn{
+    width: 100%;
+    color: white;
+    font-weight: bold;
+    background-color: #125BFF;
+    border: 3px solid white;
+    height: 6vh;
+    margin-bottom: 1em;
 }
 
 /*=====================Controls/ Buttons=====================*/
@@ -137,6 +147,16 @@ div.row > #edit_controls{
     border: none;
 }
 
+#node_controls{
+    background: none;
+    height: 4em;
+    padding-right: 0.2%;
+}
+
+div.row > #node_controls{
+    border: none;
+}
+
 #edit_body{
     margin-right: -8%;
 }
@@ -148,6 +168,15 @@ div.row > #edit_controls{
     background-color: #125BFF;
     border: 3px solid white;
     height: 3em;
+}
+
+#menu_tree tr:hover{
+    cursor: pointer;
+}
+
+#menu_tree tr.selected{
+    background-color: lightgray !important;
+    font-weight: bold;
 }
 
 /*==============================================================
@@ -191,7 +220,7 @@ h2{
     font-size: 1.2em;
 }
 
-tr:hover{
+#menu_list tr:hover{
     background-color: #125BFF;
     cursor: pointer;
 }
@@ -201,7 +230,7 @@ tr:hover > th{
     cursor: default;
 }
 
-tr.selected{
+#menu_list tr.selected{
     background-color: #125BFF !important;
     font-weight: bold;
 }
@@ -231,6 +260,7 @@ tr.selected{
      border-radius: 5px;
      width: 90px;
      margin-bottom: 1em;
+     cursor: pointer;
  }
 
  .row a{
