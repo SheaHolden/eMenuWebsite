@@ -94,7 +94,7 @@ function create_new_menu($name, $restaurant){
         return false;
     } else {
         $sql = "insert into Menu (menu_name, rest_id, date)
-                values ('$name', $id, $curr_date)  ";
+                values ('$name', $id, $curr_date)";
 
         mysqli_query($conn, $sql);
 

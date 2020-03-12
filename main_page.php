@@ -69,48 +69,46 @@ if (!isset($_SESSION['SignIn'])) {
                 <div class="row">
                     <form id="menu_edit_rows" method="post" action="eMenu_controller.php">
                         <label class="form-label">Item Name: </label>
-                        <input class="form-input" type="text" name="form_item_name" required>
+                        <input class="form-input" id="form_item_name" type="text" name="form_item_name" required>
                         <br>
                         <label class="form-label">Item Category: </label>
-                        <input class="form-input" type="text" name="form_item_category" required>
+                        <input class="form-input" id="form_item_category" type="text" name="form_item_category" required>
                         <br>
                         <label class="form-label">Item Subcategory: </label>
-                        <input class="form-input" type="text" name="form_item_subcategory" required>
+                        <input class="form-input" id="form_item_subcategory" type="text" name="form_item_subcategory" required>
                         <br>
                         <label class="form-label">Item Price: </label>
-                        <input class="form-input" type="text" name="form_item_price" required>
+                        <input class="form-input" id="form_item_price" type="text" name="form_item_price" required>
                         <br>
                         <label class="form-label">Item Badges: </label>
-                        <input class="form-input" type="text" name="form_item_Badges" required>
+                        <input class="form-input" id="form_item_Badges" type="text" name="form_item_Badges" required>
                         <br>
                         <label class="form-label">Item Image: </label>
-                        <input class="form-input" type="text" name="form_item_image" required>
+                        <input class="form-input" id="form_item_image" type="text" name="form_item_image" required>
                         <br>
                         <label class="form-label">Item Description: </label>
-                        <input class="form-input" type="text" name="form_item_description" required>
+                        <input class="form-input" id="form_item_description" type="text" name="form_item_description" required>
                     </form>
                 </div>
             </div>
             <div class="col-lg-2" id="node_controls">
-                <button id="add_category" class="menu-node-btn">New Category</button>
-                <button id="add_subcategory" class="menu-node-btn">New Subcategory</button>
-                <button id="add_badge" class="menu-node-btn">New Badge</button>
-                <button id="add_image" class="menu-node-btn">Import Image</button>
-                <br><br><br><br><br><br><br><br><br><br><br><br><br>
-                <button id="save_changes" class="menu-node-btn">Save Changes</button>
-                <button id="menu_activate" class="menu-node-btn">Activate Menu</button>
+                <div class="row" style="height: 62.5vh">
+                    <button id="add_category" class="menu-node-btn">New Category</button>
+                    <button id="add_subcategory" class="menu-node-btn">New Subcategory</button>
+                    <button id="add_badge" class="menu-node-btn">New Badge</button>
+                    <button id="add_image" class="menu-node-btn">Import Image</button>
+                </div>
+                <div class="row">
+                    <button id="save_changes" class="menu-node-btn">Save Changes</button>
+                    <button id="menu_activate" class="menu-node-btn">Activate Menu</button>
+                </div>
             </div>
         </div>
-        <!--<div class="row" style="text-align: right">
-            <div class="col-lg-12" id="edit_controls">
-
-            </div>
-        </div>-->
     </div>
 
     <!--==================================Modals=======================================-->
     <!--Menu Manager Modal-->
-    <div class="container" >
+    <div class="container">
         <div class="column" id="menu_manager_modal">
             <div class="row" style="padding: 0 1em;" id="menu_top">
                 <h2>Manage Menus</h2>
@@ -147,7 +145,7 @@ if (!isset($_SESSION['SignIn'])) {
                     <label class="form-label">Menu Name</label><br>
                     <input class="field" id="new_menu_name" type="text" name="new_menu_name" required>
                     <br>
-                    <input class="btn" id="new_submit" type="button" value="Create">
+                    <input class="btn" id="new_submit" type="submit" value="Create">
                     <input class="btn" id="new_cancel" type="button" value="Cancel"><br>
                 </form>
             </div>
@@ -195,26 +193,7 @@ if (!isset($_SESSION['SignIn'])) {
 
         //Edit menu button
         $('#menu_edit').click(function () {
-            $.post("eMenu_controller.php",
-                {page: 'MainPage', command: "GetMenuData", data: name},
-                function (data) {
-                    var rows = JSON.parse(data);
-                    var tree = '';
-                    tree += "<table id='menu_edit_table'>";
-                    tree += "<tr><th>" + name + "</th></tr>";
-                    for (var i in rows.categories){
-                        tree += "<tr><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
-                        for (var j in rows.categories[i].subcategories){
-                            tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
-                            for (var k in rows.categories[i].subcategories[j].menu_items) {
-                                tree += "<tr><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
-                            }
-                        }
-                    }
-                    tree += "</table>";
-                    $("#menu_tree").html(tree);
-
-                });
+            edit_menu();
             $('#menu_manager_modal').hide();
             $('#menu_options').hide();
             $('#blanket').hide();
@@ -277,7 +256,7 @@ if (!isset($_SESSION['SignIn'])) {
 
             var newName = $('#new_menu_name').val();
 
-            if (name !== "") {
+            if (newName !== "") {
                 $.post("eMenu_controller.php",
                     {page: 'MainPage', command: 'DuplicateMenu', data: {menu: name, newName: newName}},
                     function (data) {
@@ -286,11 +265,12 @@ if (!isset($_SESSION['SignIn'])) {
                         response.show();
                         response.html(data);
                         setTimeout(function(){ response.hide(); }, 3000);
-                    });
-                $.post("eMenu_controller.php",
-                    { page: 'MainPage', command: 'GetMenus' },
-                    function(data) {
-                        $("#menu_list").html(data);
+
+                        $.post("eMenu_controller.php",
+                            { page: 'MainPage', command: 'GetMenus' },
+                            function(data) {
+                                $("#menu_list").html(data);
+                            });
                     });
             }else
                 $("#new_menu_response").html("");
@@ -302,7 +282,6 @@ if (!isset($_SESSION['SignIn'])) {
             $('#menu_options').hide();
             $('#new_menu_form').show();
             $('#blanket').show();
-
         });
 
         //Cancel button
@@ -332,37 +311,62 @@ if (!isset($_SESSION['SignIn'])) {
             }else
                 $("#new_menu_response").html(".....");
         });
-    });
 
-    //==============================Page Body Controls=============================
-    //Menu Item Clicked
-    $('.tree-menu-item').click(function () {
-        var name = 'Standard Menu';
-        $.post("eMenu_controller.php",
-            {page: 'MainPage', command: "GetMenuData", data: name},
-            function (data) {
-                var parse = JSON.parse(data);
-                var info = '';
-                for (var i in parse.categories) {
-                    for (var j in parse.categories[i].subcategories) {
-                        for (var k in parse.categories[i].subcategories[j].menu_items) {
-                            info += parse.categories[i].subcategories[j].menu_items[k].item_name;
+        //==============================Page Body Controls=============================
+        //Populates menu tree and provides functionality to populate menu edit form with selected item details.
+        function edit_menu() {
+            $.post("eMenu_controller.php",
+                {page: 'MainPage', command: "GetMenuData", data: name},
+                function (data) {
+                    var rows = JSON.parse(data);
+                    var tree = '';
+                    tree += "<table id='menu_edit_table'>";
+                    tree += "<tr><th>" + name + "</th></tr>";
+                    for (var i in rows.categories) {
+                        tree += "<tr><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
+                        for (var j in rows.categories[i].subcategories) {
+                            tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
+                            for (var k in rows.categories[i].subcategories[j].menu_items) {
+                                tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " + rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
+                            }
                         }
                     }
-                }
-                $("#item_name").html(info);
-            });
-    });
+                    tree += "</table>";
+                    $("#menu_tree").html(tree);
+                    $('#menu_edit_rows > input').val("");
+                    $('#item_name').html("Item Name");
 
-    //Activate Menu button
-    $('#node_menu_activate').click(function () {
-        $.post("eMenu_controller.php",
-            { page: 'MainPage', command: 'ActivateMenu', data: name},
-            function(data) {
-                var alert = alert(data);
-                setTimeout(function(){ alert.hide(); }, 3000);
-            });
+                    //Menu item clicked
+                    var item = $('#menu_edit_table tr.i');
+                    item.click(function () {
+                        $('.selected').removeClass('selected');
+                        $(this).addClass("selected");
+                        item = $('.tree-menu-item',this).html();
+                        item = item.split("ᴸ⎯⎯ ").pop();
+                        $("#item_name").html(item);
+                        $('#form_item_name').val(item);
+                    });
+                });
+        }
     });
+    //Menu Item Clicked
+    // $('.tree-menu-item').click(function () {
+    //     var name = 'Standard Menu';
+    //     $.post("eMenu_controller.php",
+    //         {page: 'MainPage', command: "GetMenuData", data: name},
+    //         function (data) {
+    //             var parse = JSON.parse(data);
+    //             var info = '';
+    //             for (var i in parse.categories) {
+    //                 for (var j in parse.categories[i].subcategories) {
+    //                     for (var k in parse.categories[i].subcategories[j].menu_items) {
+    //                         info += parse.categories[i].subcategories[j].menu_items[k].item_name;
+    //                     }
+    //                 }
+    //             }
+    //             $("#item_name").html(info);
+    //         });
+    // });
 
     //==============================Account/ dropdown controls==============================
     //Account
