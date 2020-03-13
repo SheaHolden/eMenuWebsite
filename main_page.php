@@ -15,6 +15,7 @@ if (!isset($_SESSION['SignIn'])) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="main_styles.css">
     <!--<script src="eMenu_script.js"></script>-->
+    <script src="populatejs/populatejs.min.js"></script>
 </head>
 
 <header>
@@ -67,7 +68,7 @@ if (!isset($_SESSION['SignIn'])) {
             <div class="col-lg-6" id="menu_edit_form">
                 <h1 style="text-align: center;" id="item_name">Item Name</h1>
                 <div class="row">
-                    <form id="menu_edit_rows" method="post" action="eMenu_controller.php">
+                    <form id="menu_edit_rows">
                         <label class="form-label">Item Name:</label>
                             <input class="form-input" id="form_item_name" type="text" name="form_item_name" required>
                         <br>
@@ -322,14 +323,15 @@ if (!isset($_SESSION['SignIn'])) {
             $.post("eMenu_controller.php",
                 {page: 'MainPage', command: "GetMenuData", data: name},
                 function (data) {
-                    var rows = JSON.parse(data);
+                    get_json_data('tree', data, '');
+                    /*var rows = JSON.parse(data);
                     var tree = '';
                     tree += "<table id='menu_edit_table'>";
                     tree += "<tr><th>" + name + "</th></tr>";
                     for (var i in rows.categories) {
-                        tree += "<tr><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
+                        tree += "<tr class='c'><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
                         for (var j in rows.categories[i].subcategories) {
-                            tree += "<tr><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " +
+                            tree += "<tr class='s'><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " +
                                 rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
                             for (var k in rows.categories[i].subcategories[j].menu_items) {
                                 tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " +
@@ -340,10 +342,10 @@ if (!isset($_SESSION['SignIn'])) {
                     tree += "</table>";
                     $("#menu_tree").html(tree);
                     $('#menu_edit_rows > input').val("");
-                    $('#item_name').html("Item Name");
+                    $('#item_name').html("Item Name");*/
 
                     //Menu item clicked
-                    //TODO: Populate all fields with item data
+                    //TODO: Populate all fields with relative item data
                     var item = $('#menu_edit_table tr.i');
                     item.click(function () {
                         $('.selected').removeClass('selected');
@@ -351,12 +353,73 @@ if (!isset($_SESSION['SignIn'])) {
                         item = $('.tree-menu-item',this).html();
                         item = item.split("ᴸ⎯⎯ ").pop();
                         $("#item_name").html(item);
-                        $('#form_item_name').val(item);
+                        get_json_data('form', data, item);
+                        //$('#form_item_category').val(cat);
+                        //$('#form_item_subcategory').val(subcat);
                     });
                 });
             //TODO: node control button functionality
         }
 
+        //reads all menu data and returns specific fields depending on method
+        function get_json_data(method, data, iItem){
+            var file = JSON.parse(data);
+            var tree = '';
+            var iCat, iSub, iName, iPrice, iBadge, iDesc, iImg;
+
+            if (method === 'tree'){
+                tree += "<table id='menu_edit_table'>";
+                tree += "<tr><th>" + name + "</th></tr>";
+                for (var i in file.categories) {
+                    tree += "<tr class='c'><td class='tree-category'>ᴸ⎯⎯ " + file.categories[i].category_name + "</td></tr>";
+                    for (var j in file.categories[i].subcategories) {
+                        tree += "<tr class='s'><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " +
+                            file.categories[i].subcategories[j].subcategory_name + "</td></tr>";
+                        for (var k in file.categories[i].subcategories[j].menu_items) {
+                            tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " +
+                                file.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
+                        }
+                    }
+                }
+                tree += "</table>";
+                $("#menu_tree").html(tree);
+                //clears form fields when tree is refreshed
+                $('#menu_edit_file > input').val("");
+                $('#item_name').html("Item Name");
+            }else if (method === 'form'){
+                for (var a in file.categories) {
+                    //iCat = file.categories[a].category_name;
+                    for (var b in file.categories[a].subcategories) {
+                        //iSub = file.categories[a].subcategories[b].subcategory_name;
+                        for (var c in file.categories[a].subcategories[b].menu_items) {
+                             for (var l in file.categories[a].subcategories[b].menu_items[c].item_name) {
+                                 if((file.categories[a].subcategories[b].menu_items[l].item_name) === iItem)
+                                 {
+                                     iCat = file.categories[a].category_name;
+                                     iSub = file.categories[a].subcategories[b].subcategory_name;
+                                     iName = file.categories[a].subcategories[b].menu_items[l].item_name;
+                                     iPrice = file.categories[a].subcategories[b].menu_items[l].item_price;
+                                     iBadge = file.categories[a].subcategories[b].menu_items[l].item_badges;
+                                     iDesc = file.categories[a].subcategories[b].menu_items[l].item_desc;
+                                     //iImg = file.categories[a].subcategories[j].menu_items[k].item_image;
+
+                                     $('#form_item_category').val(iCat);
+                                     $('#form_item_subcategory').val(iSub);
+                                     $('#form_item_name').val(iName);
+                                     $('#form_item_price').val(iPrice);
+                                     $('#form_item_Badges').val(iBadge);
+                                     $('#form_item_image').val('img_name.png');
+                                     $('#form_item_description').val(iDesc);
+                                 }
+
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        }
         //Disables activate menu button until changes have been saved
         var node_menu_activate = $('#node_menu_activate');
         node_menu_activate.prop('disabled', true);
@@ -388,7 +451,7 @@ if (!isset($_SESSION['SignIn'])) {
     });
 
     //Help
-    //TODO: Make help page
+    //TODO: Make help page. May Skip for this assignment.
 
     //Sign out
     $('#nav_sign_out').click(function () {
