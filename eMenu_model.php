@@ -2,7 +2,13 @@
 
 $conn = mysqli_connect('localhost', 'sholdenw20', 'Keenen1997', 'C354_sholdenw20');
 
-//Determines if login credentials are valid.
+/**==========================================================================================
+ * Determines if login credentials are valid.
+ * @param $u : Username
+ * @param $p : Password
+ * @return bool : true if credentials are valid or false if they are not.
+ * ==========================================================================================
+ */
 function is_valid($u, $p){
     global $conn;
 
@@ -14,7 +20,13 @@ function is_valid($u, $p){
         return false;
 }
 
-//Determines if menu exists in DB to prevent duplicates.
+/**==========================================================================================
+ * Determines if menu exists in DB to prevent duplicates.
+ * @param $name : The name of the new menu trying to be created.
+ * @param $restaurant : The name of the restaurant menu is being created for.
+ * @return bool : True if menu name and restaurant combination does not exist in DB or false if it does.
+ * ==========================================================================================
+ */
 function is_new($name, $restaurant)
 {
     global $conn;
@@ -28,7 +40,12 @@ function is_new($name, $restaurant)
         return true;
 }
 
-//Retreives restaurant id
+/**==========================================================================================
+ * Retrieves restaurant id
+ * @param $u : Username of the currently logged in restaurant
+ * @return string : id of restaurant.
+ * ==========================================================================================
+ */
 function get_rest_id($u)
 {
     global $conn;
@@ -43,7 +60,12 @@ function get_rest_id($u)
         return 'ID not found.';
 }
 
-//Retrieves menu name and date associated with restaurant and stores them in array.
+/**==========================================================================================
+ * Retrieves menu name and date associated with restaurant and stores them in array.
+ * @param $restaurant : The name of the restaurant menu is being created for.
+ * @return array : associative array of all menus belonging to restaurant.
+ * ==========================================================================================
+ */
 function get_menu_list($restaurant){
     global $conn;
 
@@ -68,8 +90,12 @@ function get_menu_list($restaurant){
         return $data;
     }
 }
-
-//Retrieves account name from database to display in header.
+/**==========================================================================================
+ * Retrieves account name from database to display in header.
+ * @param $u : Username of the currently logged in restaurant
+ * @return string : Name of the restaurant or default string if it can't be found
+ * ==========================================================================================
+ */
 function get_name($u){
     global $conn;
 
@@ -83,18 +109,23 @@ function get_name($u){
         return 'Account name';
 }
 
-//Creates new blank menu and adds it to database. New menu contains nothing in data column.
-//TODO: Fix bug where clicking new_submit button signs user out.
+/**==========================================================================================
+ * Creates new blank menu and adds it to database. New menu contains nothing in data column.
+ * @param $name : The name of the new menu that will be created.
+ * @param $restaurant : The name of the restaurant menu is being created for.
+ * @return bool : True if creation is successful or false if it is not.
+ * ==========================================================================================
+ */
 function create_new_menu($name, $restaurant){
     global $conn;
 
     $id = get_rest_id($restaurant);
-    $curr_date = date("mm "/" dd "/" y");
     if ($id == "") {
         return false;
     } else {
-        $sql = "insert into Menu (menu_name, rest_id, date)
-                values ('$name', $id, $curr_date)";
+        $curr_date = date('m\/d\/Y');
+        $sql = "insert into Menu (menu_name, data, rest_id, date)
+                values ('$name', '{}', '$id', '$curr_date')";
 
         mysqli_query($conn, $sql);
 
@@ -102,7 +133,13 @@ function create_new_menu($name, $restaurant){
     }
 }
 
-//Activates menu. Updates published_id in Restaurant DB to selected menu.
+/**==========================================================================================
+ * Activates menu. Updates published_id in Restaurant DB to selected menu.
+ * @param $name : The name of the menu that will be activated.
+ * @param $restaurant : The name of the restaurant menu is being activated for.
+ * @return bool : True if activation is successful or false if it is not.
+ * ==========================================================================================
+ */
 function activate_menu($name, $restaurant){
     global $conn;
 
@@ -124,7 +161,13 @@ function activate_menu($name, $restaurant){
         return false;
 }
 
-//Deletes menu from DB
+/**==========================================================================================
+ * Deletes menu from DB
+ * @param $name : The name of the menu that will be deleted.
+ * @param $restaurant : The name of the restaurant menu is being deleted from.
+ * @return bool : True if deletion is successful or false if it is not.
+ * ==========================================================================================
+ */
 function delete_menu($name, $restaurant){
     global $conn;
 
@@ -148,6 +191,14 @@ function delete_menu($name, $restaurant){
         return false;
 }
 
+/**==========================================================================================
+ * Duplicates Menu
+ * @param $menu : The name of the menu being duplicated.
+ * @param $name : The name of the new menu that will be created.
+ * @param $restaurant : The name of the restaurant menu is being duplicated for.
+ * @return bool : True if duplication is successful or false if it is not.
+ * ==========================================================================================
+ */
 //Duplicates menu
 function duplicate_menu($menu, $name, $restaurant){
     global $conn;

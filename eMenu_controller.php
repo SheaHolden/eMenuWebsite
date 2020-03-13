@@ -24,7 +24,7 @@ if ($_POST['page'] == 'SigninPage') {
             break;
 
         case 'ForgotPassword':
-            //TODO Make this work lol. Low priority.
+            //TODO Make this work. Can omit for this assignment. Low priority.
             break;
     }
 }

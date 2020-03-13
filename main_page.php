@@ -119,7 +119,7 @@ if (!isset($_SESSION['SignIn'])) {
                 Loading Menus...
             </div>
             <div class="row" style="text-align: center; font-weight: bold; margin: -10px;">
-                <p id="menu_manager_response" style="display: none; height: 1.5em; background-color: #125BFF"></p>
+                <p id="menu_manager_response" style="display: none; height: fit-content; background-color: #125BFF; cursor: pointer;"></p>
             </div>
         </div>
         <div class="column" id="menu_options">
@@ -173,7 +173,9 @@ if (!isset($_SESSION['SignIn'])) {
             });
     });
 
-    //==============================Menu Manager controls==============================
+    /**==========================================================================================
+     * Menu Manager Controls
+     ==========================================================================================*/
     //Retrieves account name and list of menus on page load
     window.addEventListener('load' ,function () {
         var name = '';
@@ -246,7 +248,7 @@ if (!isset($_SESSION['SignIn'])) {
                 del.css("background-color", "darkred");
             }
             confirm.toggle();
-            confirm.html('Click here to delete selected menu.');
+            confirm.html('Click here to delete selected menu. This action cannot be undone.');
             confirm.click(function () {
                 $.post("eMenu_controller.php",
                     { page: 'MainPage', command: 'DeleteMenu', data: name},
@@ -264,6 +266,7 @@ if (!isset($_SESSION['SignIn'])) {
         });
 
         //Duplicate menu button
+        //TODO: Fix bug where new menu data is blank
         $('#menu_duplicate').click(function () {
             $('#new_menu_form').show();
             $('#menu_options').hide();
@@ -285,7 +288,9 @@ if (!isset($_SESSION['SignIn'])) {
                 $("#new_menu_response").html("");
         });
 
-        //==============================New Menu Controls==============================
+        /**==========================================================================================
+         * New Menu Controls
+         ==========================================================================================*/
         //New Menu Button
         $('#new_menu').click(function () {
             $('#menu_options').hide();
@@ -299,25 +304,28 @@ if (!isset($_SESSION['SignIn'])) {
         });
 
         //Submit button
-        //TODO: fix bug described in model.
+        //TODO: fix bug where response does not appear in manager modal
+        //TODO: fix bug where after a menu is created options dont appear when menu is clicked
         $('#new_submit').click(function (event) {
-
             event.preventDefault();
             var newName = $('#new_menu_name').val();
             if (newName !== "") {
                 $.post("eMenu_controller.php",
                     {page: 'MainPage', command: 'CreateNewMenu', data: newName},
                     function (data) {
-                        //TODO: assign returned title to menu_tree title and close modal
                         $("#menu_manager_response").html(data);
 
                         refresh_menu_list();
+                        $('#menu_manager_modal').focus();
+                        $('#new_menu_form').hide();
                     });
             }else
-                $("#new_menu_response").html(".....");
+                $("#new_menu_response").html("Must enter a name");
         });
 
-        //==============================Page Body Controls=============================
+        /**==========================================================================================
+         * Page Body Controls
+         ==========================================================================================*/
         //Populates menu tree and provides functionality to populate menu edit form with selected item details.
         function edit_menu() {
             $.post("eMenu_controller.php",
@@ -346,6 +354,7 @@ if (!isset($_SESSION['SignIn'])) {
             var tree = '';
             var iCat, iSub, iName, iPrice, iBadge, iDesc, iImg;
 
+            //if method = tree, the menu tree is populated with categories, subcategories, and items
             if (method === 'tree'){
                 tree += "<table id='menu_edit_table'>";
                 tree += "<tr><th>" + name + "</th></tr>";
@@ -365,7 +374,7 @@ if (!isset($_SESSION['SignIn'])) {
                 //clears form fields when tree is refreshed
                 $('#menu_edit_rows > input').val("");
                 $('#item_name').html("Item Name");
-            // When method = form, edit fields are populated with data form json
+            // if method = form, edit fields are populated with data from json
             }else if (method === 'form'){
                 //Parsing through nested json arrays to get to menu items
                 for (var a in file.categories) {
@@ -411,7 +420,9 @@ if (!isset($_SESSION['SignIn'])) {
             node_menu_activate.css('background-color', '#125BFF');
         });
     });
-    //==============================Account/ dropdown controls==============================
+    /**==========================================================================================
+     * Account/ Dropdown Controls
+     ==========================================================================================*/
     //Account
     $('#account_btn').click(function () {
         $('.nav-dropdown').toggle();
@@ -425,8 +436,11 @@ if (!isset($_SESSION['SignIn'])) {
         $('.nav-dropdown').hide();
     });
 
+    //Account Settings
+    //TODO: Make account settings page and functionality. May skip for this portion of the assignment.
+
     //Help
-    //TODO: Make help page. May Skip for this assignment.
+    //TODO: Make help page. May Skip for this portion of the assignment.
 
     //Sign out
     $('#nav_sign_out').click(function () {
@@ -436,7 +450,9 @@ if (!isset($_SESSION['SignIn'])) {
         );
     });
 
-    //==============================Timeout==============================
+    /**==========================================================================================
+     * Timeout Functionality
+     ==========================================================================================*/
     document.getElementById('nav_sign_out').addEventListener('click', function() {
         timeout();
     });
