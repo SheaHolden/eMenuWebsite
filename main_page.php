@@ -324,28 +324,9 @@ if (!isset($_SESSION['SignIn'])) {
                 {page: 'MainPage', command: "GetMenuData", data: name},
                 function (data) {
                     get_json_data('tree', data, '');
-                    /*var rows = JSON.parse(data);
-                    var tree = '';
-                    tree += "<table id='menu_edit_table'>";
-                    tree += "<tr><th>" + name + "</th></tr>";
-                    for (var i in rows.categories) {
-                        tree += "<tr class='c'><td class='tree-category'>ᴸ⎯⎯ " + rows.categories[i].category_name + "</td></tr>";
-                        for (var j in rows.categories[i].subcategories) {
-                            tree += "<tr class='s'><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " +
-                                rows.categories[i].subcategories[j].subcategory_name + "</td></tr>";
-                            for (var k in rows.categories[i].subcategories[j].menu_items) {
-                                tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " +
-                                    rows.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
-                            }
-                        }
-                    }
-                    tree += "</table>";
-                    $("#menu_tree").html(tree);
-                    $('#menu_edit_rows > input').val("");
-                    $('#item_name').html("Item Name");*/
 
                     //Menu item clicked
-                    //TODO: Populate all fields with relative item data
+                    //TODO: Fix bug where only items in "sandwiches" subcategory updates form fields
                     var item = $('#menu_edit_table tr.i');
                     item.click(function () {
                         $('.selected').removeClass('selected');
@@ -354,8 +335,6 @@ if (!isset($_SESSION['SignIn'])) {
                         item = item.split("ᴸ⎯⎯ ").pop();
                         $("#item_name").html(item);
                         get_json_data('form', data, item);
-                        //$('#form_item_category').val(cat);
-                        //$('#form_item_subcategory').val(subcat);
                     });
                 });
             //TODO: node control button functionality
@@ -384,17 +363,16 @@ if (!isset($_SESSION['SignIn'])) {
                 tree += "</table>";
                 $("#menu_tree").html(tree);
                 //clears form fields when tree is refreshed
-                $('#menu_edit_file > input').val("");
+                $('#menu_edit_rows > input').val("");
                 $('#item_name').html("Item Name");
+            // When method = form, edit fields are populated with data form json
             }else if (method === 'form'){
+                //Parsing through nested json arrays to get to menu items
                 for (var a in file.categories) {
-                    //iCat = file.categories[a].category_name;
                     for (var b in file.categories[a].subcategories) {
-                        //iSub = file.categories[a].subcategories[b].subcategory_name;
                         for (var c in file.categories[a].subcategories[b].menu_items) {
                              for (var l in file.categories[a].subcategories[b].menu_items[c].item_name) {
-                                 if((file.categories[a].subcategories[b].menu_items[l].item_name) === iItem)
-                                 {
+                                 if((file.categories[a].subcategories[b].menu_items[l].item_name) === iItem) {
                                      iCat = file.categories[a].category_name;
                                      iSub = file.categories[a].subcategories[b].subcategory_name;
                                      iName = file.categories[a].subcategories[b].menu_items[l].item_name;
@@ -411,14 +389,11 @@ if (!isset($_SESSION['SignIn'])) {
                                      $('#form_item_image').val('img_name.png');
                                      $('#form_item_description').val(iDesc);
                                  }
-
                             }
                         }
                     }
                 }
-
             }
-
         }
         //Disables activate menu button until changes have been saved
         var node_menu_activate = $('#node_menu_activate');
