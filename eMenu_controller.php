@@ -88,10 +88,11 @@ else if ($_POST['page'] == 'MainPage') {
 
         case 'DuplicateMenu':
             //TODO: Check if this works after fixing bug in create_new_menu.
-            if (!is_new($_POST['data'], $_SESSION['accountid'])) {
+            if (is_new($_POST['data'], $_SESSION['accountid'])) {
+                $result = create_new_menu($_POST['data'], $_SESSION['accountid']);
                 $result = duplicate_menu($_POST['menu'], $_POST['newName'], $_SESSION['accountid']);
 
-                if ($result == true)
+                if ($result)
                     echo 'Menu Duplicated';
                 else
                     echo 'Error: Unable to duplicate menu.';

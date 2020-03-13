@@ -203,10 +203,10 @@ function delete_menu($name, $restaurant){
 function duplicate_menu($menu, $name, $restaurant){
     global $conn;
 
-    create_new_menu($restaurant, $name);
+    //create_new_menu($name, $restaurant);
     $id = get_rest_id($restaurant);
 
-    $sql = "select * from Menu where menu_name = '$menu' and rest_id = '$id'";
+    $sql = "select data from Menu where menu_name = '$menu' and rest_id = '$id'";
     $result = mysqli_query($conn, $sql);
 
     if ($row = mysqli_fetch_assoc($result)) {

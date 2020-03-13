@@ -179,29 +179,27 @@ if (!isset($_SESSION['SignIn'])) {
     //Retrieves account name and list of menus on page load
     window.addEventListener('load' ,function () {
         var name = '';
-        $.post("eMenu_controller.php",
-            { page: 'MainPage', command: 'GetMenus' },
-            function(data) {
-                $("#menu_list").html(data);
-
-                //Formats and gets selected menu's name
-                $('#menu_list tr.menu-list-row').click(function () {
-                    $('.selected').removeClass('selected');
-                    $(this).addClass("selected");
-                    name = $('.d',this).html();
-                    $('#menu_options').show();
-                    $('#new_menu_form').hide();
-                });
-            });
+        get_menu_list();
 
         //functions used throughout.
-        function refresh_menu_list(){
+        //Retrieves all menus associated with restaurant
+        function get_menu_list() {
             $.post("eMenu_controller.php",
-                { page: 'MainPage', command: 'GetMenus' },
-                function(data) {
+                {page: 'MainPage', command: 'GetMenus'},
+                function (data) {
                     $("#menu_list").html(data);
+
+                    //Formats and gets selected menu's name
+                    $('#menu_list tr.menu-list-row').click(function () {
+                        $('.selected').removeClass('selected');
+                        $(this).addClass("selected");
+                        name = $('.d', this).html();
+                        $('#menu_options').show();
+                        $('#new_menu_form').hide();
+                    });
                 });
         }
+        //When the activate button is clicked from the main page
         function node_activate_menu(){
             $.post("eMenu_controller.php",
                 { page: 'MainPage', command: 'ActivateMenu', data: name},
@@ -209,6 +207,7 @@ if (!isset($_SESSION['SignIn'])) {
                     alert(data);
                 });
         }
+        //When the activate button is clicked from the menu manager modal
         function activate_menu(){
             $.post("eMenu_controller.php",
                 { page: 'MainPage', command: 'ActivateMenu', data: name},
@@ -248,7 +247,16 @@ if (!isset($_SESSION['SignIn'])) {
                 del.css("background-color", "darkred");
             }
             confirm.toggle();
-            confirm.html('Click here to delete selected menu. This action cannot be undone.');
+            confirm.html('Click here to delete selected menu. \n *Warning! This action cannot be undone!*' +
+                '' +
+                '' +
+                '' +
+                '' +
+                '' +
+                '' +
+                '' +
+                '' +
+                '');
             confirm.click(function () {
                 $.post("eMenu_controller.php",
                     { page: 'MainPage', command: 'DeleteMenu', data: name},
@@ -260,7 +268,7 @@ if (!isset($_SESSION['SignIn'])) {
                         del.html('Delete');
                         del.css("background-color", "#125BFF");
 
-                        refresh_menu_list();
+                        get_menu_list()
                     });
             });
         });
@@ -282,7 +290,7 @@ if (!isset($_SESSION['SignIn'])) {
                         response.html(data);
                         setTimeout(function(){ response.hide(); }, 3000);
 
-                        refresh_menu_list();
+                        get_menu_list()
                     });
             }else
                 $("#new_menu_response").html("");
@@ -305,7 +313,7 @@ if (!isset($_SESSION['SignIn'])) {
 
         //Submit button
         //TODO: fix bug where response does not appear in manager modal
-        //TODO: fix bug where after a menu is created options dont appear when menu is clicked
+        //TODO: fix bug where menus cannot be selected after an option button is clicked
         $('#new_submit').click(function (event) {
             event.preventDefault();
             var newName = $('#new_menu_name').val();
@@ -315,8 +323,7 @@ if (!isset($_SESSION['SignIn'])) {
                     function (data) {
                         $("#menu_manager_response").html(data);
 
-                        refresh_menu_list();
-                        $('#menu_manager_modal').focus();
+                        get_menu_list()
                         $('#new_menu_form').hide();
                     });
             }else
