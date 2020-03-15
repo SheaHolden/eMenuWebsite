@@ -7,7 +7,7 @@ html{
     background-size: cover;
     background-attachment: fixed;
     overflow-x: hidden;
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
 }
 
 /*==============================================================
@@ -309,6 +309,54 @@ tr:hover > th{
 }
 
 #new_menu_form .field{
+    width: 100%;
+    margin-bottom: 1em;
+    border-color: white;
+    border-radius: 5px;
+}
+
+/*New Node Modal*/
+#node_new_modal{
+    position: absolute;
+    text-align: center;
+    display: none;
+    color: white;
+    z-index: 1000;
+    background-color: #188AFC;
+    border: 2px solid white;
+    border-radius: 10px;
+    width: 240px;
+    height: auto;
+    padding: 0.5em;
+}
+
+.field{
+    color: black;
+}
+
+#node_new_modal label, input, .btn{
+    display: inline-block;
+}
+
+#node_new_modal #node_cancel{
+    float: right;
+    margin-right: 1.8em;
+    height: 2em;
+    padding-top: 0.5%;
+    border: 2px solid white;
+    background-color: darkred;
+}
+
+#node_new_modal #node_submit{
+    float: left;
+    margin-left: 1.8em;
+    height: 2em;
+    padding-top: 0.5%;
+    border: 2px solid white;
+    background-color: #125BFF;
+}
+
+#node_new_modal .field{
     width: 100%;
     margin-bottom: 1em;
     border-color: white;

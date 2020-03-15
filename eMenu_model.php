@@ -200,13 +200,14 @@ function delete_menu($name, $restaurant){
  * ==========================================================================================
  */
 //Duplicates menu
+//TODO: Fix bug where new menu data is blank
 function duplicate_menu($menu, $name, $restaurant){
     global $conn;
 
-    //create_new_menu($name, $restaurant);
+    create_new_menu($name, $restaurant);
     $id = get_rest_id($restaurant);
 
-    $sql = "select data from Menu where menu_name = '$menu' and rest_id = '$id'";
+    $sql = "select * from Menu where menu_name = '$menu' and rest_id = '$id'";
     $result = mysqli_query($conn, $sql);
 
     if ($row = mysqli_fetch_assoc($result)) {
@@ -223,7 +224,13 @@ function duplicate_menu($menu, $name, $restaurant){
         return false;
 }
 
-//Retrieves menu data from DB and sends to controller.
+/**==========================================================================================
+ * Retrieves menu data from DB and sends to controller.
+ * @param $name : The name of the menu data is being retrieved from.
+ * @param $restaurant : The name of the restaurant menu data is being retrieved from.
+ * @return string : Contents of data column or default value if not found
+ * ==========================================================================================
+ */
 function get_menu_data($name, $restaurant){
     global $conn;
 
@@ -238,4 +245,30 @@ function get_menu_data($name, $restaurant){
         return $data;
     }else
         return 'Menu Data Not Found.';
+}
+
+/**==========================================================================================
+ * Sends updated json string to Menu data column in DB.
+ * @param $name : The name of the menu data is being saved to.
+ * @param $data : The json data to be sent to DB.
+ * @param $restaurant : The name of the restaurant the menu belongs to.
+ * @return bool : True if save is successful or false if it is not.
+ * ==========================================================================================
+ */
+function save_changes($name, $data, $restaurant){
+    global $conn;
+
+    $id = get_rest_id($restaurant);
+
+    if ($id == "") {
+        return false;
+    } else {
+        $sql = "update Menu
+            set data = '$data'
+            where menu_name = '$name' and rest_id = '$id'";
+
+        mysqli_query($conn, $sql);
+
+        return true;
+    }
 }

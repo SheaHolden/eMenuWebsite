@@ -87,9 +87,7 @@ else if ($_POST['page'] == 'MainPage') {
             break;
 
         case 'DuplicateMenu':
-            //TODO: Check if this works after fixing bug in create_new_menu.
             if (is_new($_POST['data'], $_SESSION['accountid'])) {
-                $result = create_new_menu($_POST['data'], $_SESSION['accountid']);
                 $result = duplicate_menu($_POST['menu'], $_POST['newName'], $_SESSION['accountid']);
 
                 if ($result)
@@ -119,7 +117,12 @@ else if ($_POST['page'] == 'MainPage') {
             break;
 
         case 'SaveChanges':
-            //TODO: Save all changes to DB.
+            $result = save_changes($_POST['menu'], $_POST['str'], $_SESSION['accountid']);
+
+            if ($result)
+                echo 'Changes Saved';
+            else
+                echo 'Error: Unable to save changes.';
             break;
 
         case 'SignOut':

@@ -38,9 +38,9 @@ if (!isset($_SESSION['SignIn'])) {
                         <div class="row" id="nav_account_settings">
                             <a>Account Settings</a>
                         </div>
-                        <div class="row" id="nav_help">
+                        <!--<div class="row" id="nav_help">
                             <a>Help</a>
-                        </div>
+                        </div>-->
                         <div class="row" id="nav_sign_out">
                             <a>Sign Out</a>
                         </div>
@@ -94,6 +94,7 @@ if (!isset($_SESSION['SignIn'])) {
             </div>
             <div class="col-lg-2" id="node_controls">
                 <div class="row" style="height: 62.5vh">
+                    <button id="add_item" class="menu-node-btn">New Item</button>
                     <button id="add_category" class="menu-node-btn">New Category</button>
                     <button id="add_subcategory" class="menu-node-btn">New Subcategory</button>
                     <button id="add_badge" class="menu-node-btn">New Badge</button>
@@ -152,6 +153,50 @@ if (!isset($_SESSION['SignIn'])) {
             </div>
         </div>
     </div>
+
+    <!--Account Settings Modal-->
+    <div class="container" style="display: none">
+        <div class="row" id="account_settings_modal">
+            <form id="account_settings">
+                <label class="form-label">Name:</label>
+                <input class="form-input" id="account_name" type="text" name="account_name" required>
+                <br>
+                <label class="form-label">Username: </label>
+                <input class="form-input" id="account_username" type="text" name="account_username" required>
+                <br>
+                <input class="form-input" id="change_password_btn" type="button" value="Change Password">
+                <br>
+                <label class="form-label">Password: </label>
+                <input class="form-input" id="account_password" type="text" name="account_password">
+                <br>
+                <input class="form-input" id="account_password_confirm" type="text" name="account_password_confirm">
+                <br>
+                <label class="form-label">Email: </label>
+                <input class="form-input" id="account_email" type="text" name="account_email" required>
+                <br>
+                <label class="form-label">Address: </label>
+                <input class="form-input" id="account_address" type="text" name="account_address" required>
+                <br>
+                <label class="form-label">Phone Number: </label>
+                <input class="form-input" id="account_phone" type="text" name="account_phone" required>
+            </form>
+        </div>
+    </div>
+
+    <!--New Menu Node Modal-->
+    <div class="container">
+        <div class="column">
+            <div class="row"  id="node_new_modal">
+                <form>
+                    <label class="form-label">Name</label><br>
+                    <input class="field" id="node_new_name" type="text" name="node_new_name" required>
+                    <br>
+                    <input class="btn" id="node_submit" type="submit" value="Create">
+                    <input class="btn" id="node_cancel" type="button" value="Cancel"><br>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 <script>
@@ -164,6 +209,8 @@ if (!isset($_SESSION['SignIn'])) {
         document.getElementById('menu_options').style.left = 'calc(50% + 180px)';
         document.getElementById('new_menu_form').style.top = 'calc(50% - 15em)';
         document.getElementById('new_menu_form').style.left = 'calc(50% + 180px)';
+        document.getElementById('node_new_modal').style.top = 'calc(50% - 7em)';
+        document.getElementById('node_new_modal').style.left = 'calc(50% - 105px)';
         $('#menu_manager_modal').show();
         $('#blanket').show();
         $.post("eMenu_controller.php",
@@ -219,7 +266,7 @@ if (!isset($_SESSION['SignIn'])) {
                 });
         }
 
-        //Edit menu button
+        //Edit menu button click event listener
         $('#menu_edit').click(function () {
             edit_menu();
             $('#menu_manager_modal').hide();
@@ -228,12 +275,12 @@ if (!isset($_SESSION['SignIn'])) {
             $('#body').show();
         });
 
-        //Activate Menu button
+        //Activate Menu button click event listener
         $('#menu_activate').click(function () {
             activate_menu();
         });
 
-        //Delete menu button
+        //Delete menu button click event listener
         $('#menu_delete').click(function () {
             var confirm = $('#menu_manager_response');
             var del = $('#menu_delete');
@@ -247,16 +294,7 @@ if (!isset($_SESSION['SignIn'])) {
                 del.css("background-color", "darkred");
             }
             confirm.toggle();
-            confirm.html('Click here to delete selected menu. \n *Warning! This action cannot be undone!*' +
-                '' +
-                '' +
-                '' +
-                '' +
-                '' +
-                '' +
-                '' +
-                '' +
-                '');
+            confirm.html('Click here to delete selected menu. \n *Warning! This action cannot be undone!*');
             confirm.click(function () {
                 $.post("eMenu_controller.php",
                     { page: 'MainPage', command: 'DeleteMenu', data: name},
@@ -273,8 +311,7 @@ if (!isset($_SESSION['SignIn'])) {
             });
         });
 
-        //Duplicate menu button
-        //TODO: Fix bug where new menu data is blank
+        //Duplicate menu button click event listener
         $('#menu_duplicate').click(function () {
             $('#new_menu_form').show();
             $('#menu_options').hide();
@@ -288,32 +325,30 @@ if (!isset($_SESSION['SignIn'])) {
                         var response = $("#menu_manager_response");
                         response.show();
                         response.html(data);
-                        setTimeout(function(){ response.hide(); }, 3000);
+                        //setTimeout(function(){ response.hide(); }, 3000);
 
                         get_menu_list()
                     });
             }else
                 $("#new_menu_response").html("");
         });
-
         /**==========================================================================================
          * New Menu Controls
          ==========================================================================================*/
-        //New Menu Button
+        //New Menu Button click event listener
         $('#new_menu').click(function () {
             $('#menu_options').hide();
             $('#new_menu_form').show();
             $('#blanket').show();
         });
 
-        //Cancel button
+        //Cancel button click event listener
         $('#new_cancel').click(function () {
             $('#new_menu_form').hide();
         });
 
-        //Submit button
+        //Submit button click event listener
         //TODO: fix bug where response does not appear in manager modal
-        //TODO: fix bug where menus cannot be selected after an option button is clicked
         $('#new_submit').click(function (event) {
             event.preventDefault();
             var newName = $('#new_menu_name').val();
@@ -323,7 +358,7 @@ if (!isset($_SESSION['SignIn'])) {
                     function (data) {
                         $("#menu_manager_response").html(data);
 
-                        get_menu_list()
+                        get_menu_list();
                         $('#new_menu_form').hide();
                     });
             }else
@@ -352,17 +387,16 @@ if (!isset($_SESSION['SignIn'])) {
                         get_json_data('form', data, item);
                     });
                 });
-            //TODO: node control button functionality
         }
 
         //reads all menu data and returns specific fields depending on method
-        function get_json_data(method, data, iItem){
+        function get_json_data(method, data, iItem) {
             var file = JSON.parse(data);
             var tree = '';
             var iCat, iSub, iName, iPrice, iBadge, iDesc, iImg;
 
             //if method = tree, the menu tree is populated with categories, subcategories, and items
-            if (method === 'tree'){
+            if (method === 'tree') {
                 tree += "<table id='menu_edit_table'>";
                 tree += "<tr><th>" + name + "</th></tr>";
                 for (var i in file.categories) {
@@ -370,9 +404,9 @@ if (!isset($_SESSION['SignIn'])) {
                     for (var j in file.categories[i].subcategories) {
                         tree += "<tr class='s'><td class='tree-subcategory' style='padding-left: 2.5em;'>ᴸ⎯⎯ " +
                             file.categories[i].subcategories[j].subcategory_name + "</td></tr>";
-                        for (var k in file.categories[i].subcategories[j].menu_items) {
+                        for (var k in file.categories[i].subcategories[j].items) {
                             tree += "<tr class='i'><td class='tree-menu-item' style='padding-left: 5em;'>ᴸ⎯⎯ " +
-                                file.categories[i].subcategories[j].menu_items[k].item_name + "</td></tr>";
+                                file.categories[i].subcategories[j].items[k].item_name + "</td></tr>";
                         }
                     }
                 }
@@ -381,50 +415,141 @@ if (!isset($_SESSION['SignIn'])) {
                 //clears form fields when tree is refreshed
                 $('#menu_edit_rows > input').val("");
                 $('#item_name').html("Item Name");
-            // if method = form, edit fields are populated with data from json
-            }else if (method === 'form'){
+                // if method = form, edit fields are populated with data from json
+            } else if (method === 'form') {
                 //Parsing through nested json arrays to get to menu items
                 for (var a in file.categories) {
                     for (var b in file.categories[a].subcategories) {
-                        for (var c in file.categories[a].subcategories[b].menu_items) {
-                             for (var l in file.categories[a].subcategories[b].menu_items[c].item_name) {
-                                 if((file.categories[a].subcategories[b].menu_items[l].item_name) === iItem) {
-                                     iCat = file.categories[a].category_name;
-                                     iSub = file.categories[a].subcategories[b].subcategory_name;
-                                     iName = file.categories[a].subcategories[b].menu_items[l].item_name;
-                                     iPrice = file.categories[a].subcategories[b].menu_items[l].item_price;
-                                     iBadge = file.categories[a].subcategories[b].menu_items[l].item_badges;
-                                     iDesc = file.categories[a].subcategories[b].menu_items[l].item_desc;
-                                     //iImg = file.categories[a].subcategories[j].menu_items[k].item_image;
+                        for (var c in file.categories[a].subcategories[b].items) {
+                            for (var l in file.categories[a].subcategories[b].items[c].item_name) {
+                                if ((file.categories[a].subcategories[b].items[l].item_name) === iItem) {
+                                    iCat = file.categories[a].category_name;
+                                    iSub = file.categories[a].subcategories[b].subcategory_name;
+                                    iName = file.categories[a].subcategories[b].items[l].item_name;
+                                    iPrice = file.categories[a].subcategories[b].items[l].item_price;
+                                    iBadge = file.categories[a].subcategories[b].items[l].item_badges;
+                                    iDesc = file.categories[a].subcategories[b].items[l].item_desc;
+                                    //iImg = file.categories[a].subcategories[j].items[k].item_image;
 
-                                     $('#form_item_category').val(iCat);
-                                     $('#form_item_subcategory').val(iSub);
-                                     $('#form_item_name').val(iName);
-                                     $('#form_item_price').val(iPrice);
-                                     $('#form_item_Badges').val(iBadge);
-                                     $('#form_item_image').val('img_name.png');
-                                     $('#form_item_description').val(iDesc);
-                                 }
+                                    $('#form_item_category').val(iCat);
+                                    $('#form_item_subcategory').val(iSub);
+                                    $('#form_item_name').val(iName);
+                                    $('#form_item_price').val(iPrice);
+                                    $('#form_item_Badges').val(iBadge);
+                                    $('#form_item_image').val('img_name.png');
+                                    $('#form_item_description').val(iDesc);
+
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        function save_changes(input) {
+            $.post("eMenu_controller.php",
+                {page: 'MainPage', command: 'SaveChanges', data: {menu: name, str: input}},
+                function (data) {
+                    alert(data);
+                });
+        }
+
+        function node_control(method){
+            $('#node_new_modal').show();
+            $('#blanket').show();
+
+            //Cancel button click event listener
+            $('#node_cancel').click(function () {
+                $('#node_new_modal').hide();
+                $('#blanket').hide();
+            });
+
+            //Create button click event listener
+            $('#node_submit').click(function (event) {
+                event.preventDefault();
+                var title = $('#node_new_name').val();
+                if (title !== "") {
+                    //title = JSON.stringify(title);
+                    switch (method) {
+
+                        case 'item':
+                            //TODO: Add New Item to json
+                            alert(title);
+                            break;
+
+                        case 'category':
+                            //TODO: Add new category to json
+                            $.post("eMenu_controller.php",
+                                {page: 'MainPage', command: "GetMenuData", data: name},
+                                function (data) {
+                                    //get_json_data('tree', data, '');
+                                    var obj = JSON.parse(data);
+
+                                    obj['categories'].push({"category_name":title});
+                                    var str = JSON.stringify(obj);
+                                    alert(str);
+                                    save_changes(str);
+                                    get_json_data('tree', data, '');
+                                });
+                            $('#node_new_modal').hide();
+                            $('#blanket').hide();
+                            break;
+
+                        case 'subcategory':
+                            //TODO: Add new subcategory to json
+                            break;
+
+                        case 'badge':
+                            //TODO: Add new badge to DB
+                            break;
+                    }
+                }else
+                    alert("Must enter a name");
+            });
+        }
+
+        //New item button click event listener
+        $('#add_item').click(function () {
+            node_control('item');
+        });
+
+        //New category button click event listener
+        $('#add_category').click(function () {
+            node_control('category');
+        });
+
+        //New subcategory button click event listener
+        $('#add_subcategory').click(function () {
+            node_control('subcategory');
+        });
+
+        //New badge button click event listener
+        $('#add_badge').click(function () {
+            node_control('badge');
+        });
+
+        //Import image button click event listener
+        $('#add_image').click(function () {
+            //node_control('image');
+            alert('We are using the cs.tru.ca database, and we are not currently allowed to add images to it. ' +
+                '\nSo this feature cannot be properly implemented at this point in time.');
+        });
+
         //Disables activate menu button until changes have been saved
         var node_menu_activate = $('#node_menu_activate');
         node_menu_activate.prop('disabled', true);
         node_menu_activate.css('background-color', 'grey');
 
-        //Activate Menu button
-        node_menu_activate.click(function () {
-            node_activate_menu();
-        });
-
         //Save Changes Button
         $('#save_changes').click(function () {
             node_menu_activate.prop('disabled', false);
             node_menu_activate.css('background-color', '#125BFF');
+        });
+
+        //Activate Menu button
+        node_menu_activate.click(function () {
+            node_activate_menu();
         });
     });
     /**==========================================================================================
@@ -444,10 +569,10 @@ if (!isset($_SESSION['SignIn'])) {
     });
 
     //Account Settings
-    //TODO: Make account settings page and functionality. May skip for this portion of the assignment.
+    //TODO: Make account settings page and functionality. Skipping for this portion of the assignment.
 
     //Help
-    //TODO: Make help page. May Skip for this portion of the assignment.
+    //TODO: Make help page. Skipping for this portion of the assignment.
 
     //Sign out
     $('#nav_sign_out').click(function () {
