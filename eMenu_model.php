@@ -272,3 +272,29 @@ function save_changes($name, $data, $restaurant){
         return true;
     }
 }
+
+function add_badge($name, $restaurant){
+    global $conn;
+
+    $id = get_rest_id($restaurant);
+
+    if ($id == "")
+        return false;
+    else{
+        $badge = "select badges from Restaurant where id = '$id'";
+        $resultB = mysqli_query($conn, $badge);
+
+        if ($row = mysqli_fetch_assoc($resultB)) {
+            $data = $row['badges'];
+
+            $data .= $name .',';
+
+            $sql = "update Restaurant
+                    set badges = '$data'
+                    where id = '$id'";
+
+            mysqli_query($conn, $sql);
+        }
+        return true;
+    }
+}

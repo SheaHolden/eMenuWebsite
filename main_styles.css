@@ -316,11 +316,11 @@ tr:hover > th{
 }
 
 /*New Node Modal*/
-#node_new_modal{
+#node_new_sub_modal, #node_new_cat_modal, #node_new_item_modal, #node_new_badge_modal{
     position: absolute;
     text-align: center;
-    display: none;
     color: white;
+    display: none;
     z-index: 1000;
     background-color: #188AFC;
     border: 2px solid white;
@@ -334,11 +334,12 @@ tr:hover > th{
     color: black;
 }
 
-#node_new_modal label, input, .btn{
+#node_new_sub_modal label input .btn, #node_new_cat_modal label, input, .btn,
+#node_new_item_modal label, input, .btn, #node_new_badge_modal label, input, .btn{
     display: inline-block;
 }
 
-#node_new_modal #node_cancel{
+#node_cancel{
     float: right;
     margin-right: 1.8em;
     height: 2em;
@@ -347,7 +348,7 @@ tr:hover > th{
     background-color: darkred;
 }
 
-#node_new_modal #node_submit{
+#node_submit{
     float: left;
     margin-left: 1.8em;
     height: 2em;
@@ -356,10 +357,12 @@ tr:hover > th{
     background-color: #125BFF;
 }
 
-#node_new_modal .field{
+#node_new_sub_modal .field, #node_new_cat_modal .field,
+#node_new_item_modal .field, #node_new_badge_modal .field{
     width: 100%;
     margin-bottom: 1em;
     border-color: white;
     border-radius: 5px;
 }
+
 

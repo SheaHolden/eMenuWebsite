@@ -107,13 +107,22 @@ else if ($_POST['page'] == 'MainPage') {
                 echo 'Error: Unable to delete menu.';
             break;
 
-        case"ActivateMenu":
+        case 'ActivateMenu':
             $result = activate_menu($_POST['data'], $_SESSION['accountid']);
 
             if ($result)
                 echo 'Menu Activated';
             else
                 echo 'Error: Unable to activate menu.';
+            break;
+
+        case 'AddBadge':
+            $result = add_badge($_POST['data'], $_SESSION['accountid']);
+
+            if ($result)
+                echo 'Badge List Updated';
+            else
+                echo 'Error: Unable to add badge.';
             break;
 
         case 'SaveChanges':

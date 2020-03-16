@@ -15,7 +15,6 @@ if (!isset($_SESSION['SignIn'])) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="main_styles.css">
     <!--<script src="eMenu_script.js"></script>-->
-    <script src="populatejs/populatejs.min.js"></script>
 </head>
 
 <header>
@@ -183,16 +182,64 @@ if (!isset($_SESSION['SignIn'])) {
         </div>
     </div>
 
-    <!--New Menu Node Modal-->
+    <!--New Menu Item Modal-->
     <div class="container">
         <div class="column">
-            <div class="row"  id="node_new_modal">
+            <div class="row" id="node_new_item_modal">
                 <form>
-                    <label class="form-label">Name</label><br>
-                    <input class="field" id="node_new_name" type="text" name="node_new_name" required>
-                    <br>
-                    <input class="btn" id="node_submit" type="submit" value="Create">
-                    <input class="btn" id="node_cancel" type="button" value="Cancel"><br>
+                    <h2>New Item</h2><br>
+                    <label class="form-label" for="node_new_name">Name: </label>
+                    <input class="field" id="node_new_name" type="text" required>
+                    <label class="form-label" for="node_new_category">Category: </label>
+                    <input class="field" id="node_new_category" type="text" required>
+                    <label class="form-label" for="node_new_subcategory">Subcategory:</label>
+                    <input class="field" id="node_new_subcategory" type="text" required>
+                    <input class="node_submit" id="node_submit" type="submit" value="Create">
+                    <input class="node_cancel" id="node_cancel" type="button" value="Cancel"><br>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--New Menu Subcategory Modal-->
+    <div class="container">
+        <div class="column">
+            <div class="row" id="node_new_cat_modal">
+                <form>
+                    <h2>New Category</h2><br>
+                    <label class="form-label" for="node_new_name">Name: </label>
+                    <input class="field" id="node_new_name" type="text" required>
+                    <input class="node_submit" id="node_submit" type="submit" value="Create">
+                    <input class="node_cancel" id="node_cancel" type="button" value="Cancel"><br>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--New Menu Subcategory Modal-->
+    <div class="container">
+        <div class="column">
+            <div class="row" id="node_new_sub_modal">
+                <form>
+                    <h2>New Subcategory</h2><br>
+                    <label class="form-label" for="node_new_name">Name: </label>
+                    <input class="field" id="node_new_name" type="text" required>
+                    <label class="form-label" for="node_new_category">Category: </label>
+                    <input class="field" id="node_new_category" type="text" required>
+                    <input class="node_submit" id="node_submit" type="submit" value="Create">
+                    <input class="node_cancel" id="node_cancel" type="button" value="Cancel"><br>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--New Badge Modal-->
+    <div class="container">
+        <div class="column">
+            <div class="row" id="node_new_badge_modal">
+                <form>
+                    <h2>New Badge</h2><br>
+                    <label class="form-label" for="node_new_name">Name: </label>
+                    <input class="field" id="node_new_name" type="text" required>
+                    <input class="node_submit" id="node_submit" type="submit" value="Create">
+                    <input class="node_cancel" id="node_cancel" type="button" value="Cancel"><br>
                 </form>
             </div>
         </div>
@@ -209,8 +256,14 @@ if (!isset($_SESSION['SignIn'])) {
         document.getElementById('menu_options').style.left = 'calc(50% + 180px)';
         document.getElementById('new_menu_form').style.top = 'calc(50% - 15em)';
         document.getElementById('new_menu_form').style.left = 'calc(50% + 180px)';
-        document.getElementById('node_new_modal').style.top = 'calc(50% - 7em)';
-        document.getElementById('node_new_modal').style.left = 'calc(50% - 105px)';
+        document.getElementById('node_new_item_modal').style.top = 'calc(50% - 7em)';
+        document.getElementById('node_new_item_modal').style.left = 'calc(50% - 105px)';
+        document.getElementById('node_new_cat_modal').style.top = 'calc(50% - 7em)';
+        document.getElementById('node_new_cat_modal').style.left = 'calc(50% - 105px)';
+        document.getElementById('node_new_sub_modal').style.top = 'calc(50% - 7em)';
+        document.getElementById('node_new_sub_modal').style.left = 'calc(50% - 105px)';
+        document.getElementById('node_new_badge_modal').style.top = 'calc(50% - 7em)';
+        document.getElementById('node_new_badge_modal').style.left = 'calc(50% - 105px)';
         $('#menu_manager_modal').show();
         $('#blanket').show();
         $.post("eMenu_controller.php",
@@ -320,7 +373,7 @@ if (!isset($_SESSION['SignIn'])) {
 
             if (newName !== "") {
                 $.post("eMenu_controller.php",
-                    {page: 'MainPage', command: 'DuplicateMenu', data: {menu: name, newName: newName}},
+                    {page: 'MainPage', command: 'DuplicateMenu', menu: name, newName: newName},
                     function (data) {
                         var response = $("#menu_manager_response");
                         response.show();
@@ -449,83 +502,168 @@ if (!isset($_SESSION['SignIn'])) {
 
         function save_changes(input) {
             $.post("eMenu_controller.php",
-                {page: 'MainPage', command: 'SaveChanges', data: {menu: name, str: input}},
+                {page: 'MainPage', command: 'SaveChanges', menu: name, str: input},
                 function (data) {
                     alert(data);
                 });
         }
 
         function node_control(method){
-            $('#node_new_modal').show();
-            $('#blanket').show();
-
             //Cancel button click event listener
-            $('#node_cancel').click(function () {
-                $('#node_new_modal').hide();
+            $('.node_cancel').click(function () {
+                $('#node_new_item_modal').hide();
+                $('#node_new_cat_modal').hide();
+                $('#node_new_sub_modal').hide();
+                $('#node_new_badge_modal').hide();
                 $('#blanket').hide();
             });
 
             //Create button click event listener
-            $('#node_submit').click(function (event) {
+            $('.node_submit').click(function (event) {
                 event.preventDefault();
-                var title = $('#node_new_name').val();
+                var title, cat, sub;
+
                 if (title !== "") {
-                    //title = JSON.stringify(title);
                     switch (method) {
 
                         case 'item':
-                            //TODO: Add New Item to json
-                            alert(title);
-                            break;
-
-                        case 'category':
-                            //TODO: Add new category to json
+                            //TODO: Add New Item specific category > subcategory to json
+                            title = $('#node_new_item_modal #node_new_name').val();
+                            cat = $('#node_new_item_modal #node_new_category').val();
+                            sub = $('#node_new_item_modal #node_new_subcategory').val();
                             $.post("eMenu_controller.php",
                                 {page: 'MainPage', command: "GetMenuData", data: name},
                                 function (data) {
-                                    //get_json_data('tree', data, '');
                                     var obj = JSON.parse(data);
 
-                                    obj['categories'].push({"category_name":title});
-                                    var str = JSON.stringify(obj);
-                                    alert(str);
-                                    save_changes(str);
-                                    get_json_data('tree', data, '');
+                                    if(cat in obj['categories']){
+                                        alert('Category Already Exists');
+                                    }else {
+                                        obj['categories'].push({"item_name": title});
+                                        var str = JSON.stringify(obj);
+                                        alert(str);
+                                        save_changes(str);
+                                        $('#node_new_item_modal').hide();
+                                        $('#blanket').hide();
+                                        alert(obj)
+                                    }
                                 });
-                            $('#node_new_modal').hide();
-                            $('#blanket').hide();
+
+                            alert(title);
+                            alert(cat);
+                            alert(sub);
+                            break;
+
+                        case 'category':
+                            title = $('#node_new_cat_modal #node_new_name').val();
+                            if (title == "")
+                                alert('Must enter a name.');
+                            else {
+                                $.post("eMenu_controller.php",
+                                    {page: 'MainPage', command: "GetMenuData", data: name},
+                                    function (data) {
+                                        var obj = JSON.parse(data);
+                                        var category = (obj.categories.map(x => x.category_name));
+                                        if (category.includes(title)) {
+                                            alert('Category Already Exists');
+                                        } else {
+                                            obj['categories'].push({"category_name": title});
+                                            var str = JSON.stringify(obj);
+                                            save_changes(str);
+                                            $('#node_new_cat_modal').hide();
+                                            $('#blanket').hide();
+                                        }
+                                    });
+                            }
                             break;
 
                         case 'subcategory':
-                            //TODO: Add new subcategory to json
+                            //TODO: Add new subcategory under specific category to json
+                            title = $('#node_new_sub_modal #node_new_name').val();
+                            cat = $('#node_new_sub_modal #node_new_category').val();
+                            if (title == "" || cat == "")
+                                alert('Must fill in both fields.');
+                            else {
+                                $.post("eMenu_controller.php",
+                                    {page: 'MainPage', command: "GetMenuData", data: name},
+                                    function (data) {
+                                        var obj = JSON.parse(data);
+                                        var category = (obj.categories.map(x => x.category_name));
+                                        if (!category.includes(cat))
+                                            alert('Category Does Not Exists');
+                                        else {
+                                            var subcat = (obj.categories.filter(x => (x.category_name == cat) ? x.subcategories : null)[0].subcategories);
+                                            var subcategory = (subcat.map(x => x.subcategory_name));
+
+                                            //var asd = (obj.categories.map(x => x.category_name));
+                                            var asd = category;
+                                            //var asd = obj.cat;
+                                            alert(asd);
+
+                                            if (subcategory.includes(title)) {
+                                                alert('Subcategory Already Exists');
+                                            }else {
+                                                //obj.categories.['subcategories'].push({"subcategory_name": title});
+                                                //var str = JSON.stringify(obj);
+                                                //alert(str);
+                                                //save_changes(str);
+                                                //$('#node_new_sub_modal').hide();
+                                                //$('#blanket').hide();
+
+                                                var str1 = 'will add ' + title + ' to json under ' + cat;
+                                                alert(str1)
+                                            }
+
+
+                                        }
+                                    });
+
+                            }
                             break;
 
                         case 'badge':
-                            //TODO: Add new badge to DB
+                            title = $('#node_new_badge_modal #node_new_name').val();
+                            title = title.replace(/ /g, "_").toUpperCase();
+                            alert(title);
+                            $.post("eMenu_controller.php",
+                                {page: 'MainPage', command: "AddBadge", data: title},
+                                function (data) {
+                                    alert(data);
+                                    $('#node_new_badge_modal').hide();
+                                    $('#blanket').hide();
+                                });
                             break;
                     }
                 }else
-                    alert("Must enter a name");
+                    alert("Please enter a name");
             });
         }
 
         //New item button click event listener
         $('#add_item').click(function () {
+            $('#node_new_item_modal').show();
+            $('#blanket').show();
             node_control('item');
         });
 
         //New category button click event listener
         $('#add_category').click(function () {
+            $('#node_new_cat_modal').show();
+            $('#blanket').show();
             node_control('category');
         });
 
         //New subcategory button click event listener
         $('#add_subcategory').click(function () {
+            $('#node_new_sub_modal').show();
+            $('#blanket').show();
             node_control('subcategory');
         });
 
         //New badge button click event listener
         $('#add_badge').click(function () {
+            $('#node_new_badge_modal').show();
+            $('#blanket').show();
             node_control('badge');
         });
 
@@ -543,8 +681,16 @@ if (!isset($_SESSION['SignIn'])) {
 
         //Save Changes Button
         $('#save_changes').click(function () {
-            node_menu_activate.prop('disabled', false);
-            node_menu_activate.css('background-color', '#125BFF');
+            $.post("eMenu_controller.php",
+                {page: 'MainPage', command: "GetMenuData", data: name},
+                function (data) {
+                    var obj = JSON.parse(data);
+                    var str = JSON.stringify(obj);
+                    save_changes(str);
+                    node_menu_activate.prop('disabled', false);
+                    node_menu_activate.css('background-color', '#125BFF');
+                    alert(data);
+                });
         });
 
         //Activate Menu button
